@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Данило Александров — перукар у Дніпрі</title>
+  <meta name="description" content="Подовжені чоловічі стрижки, фейди, гоління бритвою та камуфляж сивини. Особистий простір Trinity у Дніпрі — тільки майстер і клієнт.">
+  <meta name="theme-color" content="#0B0B0C">
+  <!-- Демо-версия: не индексировать в поисковиках -->
+  <meta name="robots" content="noindex">
+
+  <!-- Шрифты: Oswald — узкий плакатный для заголовков (как на его афишах), Manrope — читаемый текст. Оба с кириллицей -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       1. ДИЗАЙН-ТОКЕНЫ
+       ========================================================= */
+    :root {
+      --bg: #0B0B0C;           /* основной фон */
+      --surface: #141416;      /* фон карточек и секций */
+      --surface-2: #1C1C1F;    /* фон при наведении */
+      --text: #F3F1EC;         /* основной текст, тёплый белый */
+      --muted: #A3A3AB;        /* второстепенный текст, контраст ~8:1 */
+      --line: #2A2A2F;         /* границы */
+      --accent: #C3192D;       /* красный, как граффити Eleven на афише */
+      --accent-hover: #A51323;
+      --accent-text: #FF5A67;  /* красный для текста на тёмном, контраст > 4.5:1 */
+
+      --font-head: "Oswald", "Arial Narrow", sans-serif;
+      --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+      --radius: 4px;
+      --header-h: 64px;
+      --ease: cubic-bezier(.22, .61, .36, 1);
+      --wrap: 1200px;
+    }
+
+    /* =========================================================
+       2. БАЗОВЫЕ СТИЛИ
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; height: auto; }
+    a { color: inherit; }
+    h1, h2, h3 { font-family: var(--font-head); font-weight: 600; text-transform: uppercase; letter-spacing: .01em; line-height: 1.05; margin: 0; }
+    p { margin: 0; }
+    :focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+
+    .wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 16px; }
+    @media (min-width: 768px) { .wrap { padding: 0 32px; } }
+
+    .section { padding: 72px 0; }
+    @media (min-width: 1024px) { .section { padding: 112px 0; } }
+
+    /* Подпись над заголовком секции: «01 — Роботи» */
+    .eyebrow {
+      display: flex; align-items: center; gap: 12px;
+      font-family: var(--font-head); font-size: 14px; font-weight: 500;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .eyebrow::before { content: ""; width: 32px; height: 1px; background: var(--accent); }
+    .section__title { font-size: clamp(36px, 7vw, 72px); }
+    .section__lead { margin-top: 16px; max-width: 560px; color: var(--muted); font-size: 17px; }
+
+    /* Кнопки */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      min-height: 52px; padding: 0 26px;
+      font-family: var(--font-head); font-size: 16px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+      text-decoration: none; border: 1px solid transparent; border-radius: var(--radius);
+      cursor: pointer; transition: background-color .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
+    }
+    .btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .btn--primary { background: var(--accent); color: #fff; }
+    .btn--primary:hover { background: var(--accent-hover); }
+    .btn--ghost { border-color: var(--line); color: var(--text); }
+    .btn--ghost:hover { border-color: var(--text); }
+
+    /* =========================================================
+       3. ШАПКА
+       ========================================================= */
+    .header {
+      position: fixed; inset: 0 0 auto; z-index: 50; height: var(--header-h);
+      display: flex; align-items: center;
+      background: rgba(11, 11, 12, .82);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid transparent;
+      transition: border-color .25s var(--ease);
+    }
+    .header.is-scrolled { border-bottom-color: var(--line); }
+    .header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .logo { font-family: var(--font-head); font-size: 20px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; }
+    .logo span { color: var(--accent-text); }
+    .nav { display: none; gap: 32px; }
+    .nav a { font-size: 15px; font-weight: 500; color: var(--muted); text-decoration: none; transition: color .2s var(--ease); }
+    .nav a:hover { color: var(--text); }
+    .header .btn { min-height: 44px; padding: 0 18px; font-size: 14px; }
+    @media (min-width: 900px) { .nav { display: flex; } }
+
+    /* =========================================================
+       4. ПЕРВЫЙ ЭКРАН
+       ========================================================= */
+    .hero { padding: calc(var(--header-h) + 32px) 0 56px; }
+    .hero__grid { display: grid; gap: 32px; }
+    .hero__meta { font-family: var(--font-head); font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+    .hero__title { margin-top: 16px; font-size: clamp(52px, 13vw, 132px); font-weight: 700; line-height: .92; }
+    .hero__title span { display: block; color: transparent; -webkit-text-stroke: 1.5px var(--text); }
+    .hero__text { margin-top: 24px; max-width: 480px; font-size: 18px; color: var(--muted); }
+    .hero__text strong { color: var(--text); font-weight: 600; }
+    .hero__actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; }
+    .hero__photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--radius); background: var(--surface); }
+    .hero__photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+    .hero__tag {
+      position: absolute; left: 12px; bottom: 12px;
+      padding: 6px 12px; background: rgba(11, 11, 12, .78);
+      font-family: var(--font-head); font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+    }
+    @media (min-width: 1024px) {
+      .hero { padding-top: calc(var(--header-h) + 64px); }
+      .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; gap: 32px 64px; }
+      .hero__head { grid-column: 1 / -1; }
+      .hero__photo { grid-column: 2; grid-row: 2; aspect-ratio: 5 / 4; }
+      .hero__body { grid-column: 1; grid-row: 2; padding-bottom: 8px; }
+    }
+
+    /* Бегущая строка с событиями */
+    .ticker { border-block: 1px solid var(--line); overflow: hidden; padding: 16px 0; }
+    .ticker__track { display: flex; gap: 48px; width: max-content; animation: ticker 32s linear infinite; }
+    .ticker__item { display: flex; align-items: center; gap: 48px; font-family: var(--font-head); font-size: 22px; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+    .ticker__item::after { content: ""; width: 8px; height: 8px; background: var(--accent); transform: rotate(45deg); }
+    @keyframes ticker { to { transform: translateX(-50%); } }
+
+    /* =========================================================
+       5. РАБОТЫ
+       ========================================================= */
+    .works__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 24px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+    .filter {
+      min-height: 44px; padding: 0 18px;
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--line); border-radius: 999px;
+      font-family: var(--font-body); font-size: 15px; font-weight: 500;
+      cursor: pointer; transition: color .2s var(--ease), border-color .2s var(--ease), background-color .2s var(--ease);
+    }
+    .filter:hover { color: var(--text); border-color: var(--muted); }
+    .filter[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+    .gallery { margin-top: 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    @media (min-width: 768px) { .gallery { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
+    @media (min-width: 1100px) { .gallery { grid-template-columns: repeat(4, 1fr); } }
+    .shot {
+      position: relative; padding: 0; border: 0; margin: 0;
+      aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--radius);
+      background: var(--surface); cursor: zoom-in;
+    }
+    /* Широкое фото: на телефоне занимает ряд целиком со своими пропорциями,
+       на планшете и десктопе не задаёт высоту ряда, а растягивается под соседние карточки */
+    .shot--wide { grid-column: span 2; aspect-ratio: 1239 / 945; }
+    @media (min-width: 768px) {
+      .shot--wide { aspect-ratio: auto; min-height: 100%; }
+      .shot--wide img { position: absolute; inset: 0; }
+    }
+    .shot img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: transform .5s var(--ease); }
+    .shot:hover img { transform: scale(1.04); }
+    .shot__label {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 32px 12px 12px; text-align: left;
+      background: linear-gradient(transparent, rgba(0, 0, 0, .75));
+      color: #fff; font-family: var(--font-head); font-size: 15px; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .shot[hidden] { display: none; }
+
+    /* Лайтбокс на нативном <dialog> */
+    .lightbox { padding: 0; border: 0; background: transparent; max-width: 100vw; max-height: 100vh; }
+    .lightbox::backdrop { background: rgba(0, 0, 0, .92); }
+    .lightbox img { max-width: min(92vw, 900px); max-height: 86vh; width: auto; object-fit: contain; }
+    .lightbox__close {
+      position: fixed; top: 16px; right: 16px;
+      width: 48px; height: 48px; display: grid; place-items: center;
+      background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 50%; cursor: pointer;
+    }
+    .lightbox__close svg { width: 22px; height: 22px; }
+    .lightbox__caption { margin-top: 12px; text-align: center; color: var(--muted); font-family: var(--font-head); letter-spacing: .1em; text-transform: uppercase; }
+
+    /* =========================================================
+       6. ПОСЛУГИ
+       ========================================================= */
+    .services { background: var(--surface); }
+    .services__grid { display: grid; gap: 48px; }
+    @media (min-width: 1024px) { .services__grid { grid-template-columns: 1fr 1.3fr; gap: 80px; } }
+    .service-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+    .service {
+      display: grid; grid-template-columns: 48px 1fr; gap: 4px 16px; align-items: baseline;
+      padding: 24px 0; border-bottom: 1px solid var(--line);
+    }
+    .service__num { font-family: var(--font-head); font-size: 15px; color: var(--accent-text); }
+    .service__name { font-family: var(--font-head); font-size: clamp(22px, 3vw, 28px); font-weight: 500; text-transform: uppercase; letter-spacing: .02em; }
+    .service__desc { grid-column: 2; color: var(--muted); font-size: 15px; }
+    .services__note { margin-top: 24px; color: var(--muted); font-size: 15px; }
+    .services__note a { color: var(--text); text-underline-offset: 3px; }
+
+    /* =========================================================
+       7. ПРО МЕНЕ
+       ========================================================= */
+    .about__grid { display: grid; gap: 40px; }
+    @media (min-width: 1024px) { .about__grid { grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; } }
+    .about__photo { aspect-ratio: 709 / 915; overflow: hidden; border-radius: var(--radius); background: var(--surface); }
+    .about__photo img { width: 100%; height: 100%; object-fit: cover; }
+    .about__text { display: grid; gap: 16px; margin-top: 24px; font-size: 17px; color: var(--muted); }
+    .about__text strong { color: var(--text); font-weight: 600; }
+    .facts { margin-top: 32px; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
+    .fact { padding: 20px 12px 0 0; }
+    .fact__value { font-family: var(--font-head); font-size: clamp(28px, 5vw, 44px); font-weight: 600; line-height: 1; }
+    .fact__label { margin-top: 8px; font-size: 13px; color: var(--muted); }
+
+    /* =========================================================
+       8. МАЙСТЕР-КЛАС
+       ========================================================= */
+    .master { border-block: 1px solid var(--line); }
+    .master__grid { display: grid; gap: 40px; }
+    @media (min-width: 900px) { .master__grid { grid-template-columns: .8fr 1fr; gap: 72px; align-items: center; } }
+    .master__poster { max-width: 440px; overflow: hidden; border-radius: var(--radius); }
+    .master__title { font-size: clamp(44px, 8vw, 88px); font-weight: 700; }
+    .master__title em { font-style: normal; color: var(--accent-text); }
+    .master__list { list-style: none; margin: 24px 0 32px; padding: 0; display: grid; gap: 12px; color: var(--muted); }
+    .master__list li { display: flex; gap: 12px; }
+    .master__list li::before { content: ""; flex-shrink: 0; width: 6px; height: 6px; margin-top: 10px; background: var(--accent); transform: rotate(45deg); }
+
+    /* =========================================================
+       9. ЗАПИС І КОНТАКТИ
+       ========================================================= */
+    .booking__title { font-size: clamp(48px, 11vw, 120px); font-weight: 700; line-height: .95; }
+    .booking__title span { color: transparent; -webkit-text-stroke: 1.5px var(--text); }
+    .booking__grid { margin-top: 48px; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    @media (min-width: 768px) { .booking__grid { grid-template-columns: repeat(3, 1fr); } }
+    .contact {
+      display: flex; flex-direction: column; gap: 12px;
+      padding: 28px 24px; background: var(--bg);
+      text-decoration: none; transition: background-color .2s var(--ease);
+    }
+    a.contact:hover { background: var(--surface); }
+    .contact svg { width: 28px; height: 28px; color: var(--accent-text); }
+    .contact__label { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+    .contact__value { font-family: var(--font-head); font-size: 22px; letter-spacing: .03em; }
+    .contact__hint { font-size: 14px; color: var(--muted); }
+
+    /* =========================================================
+       10. ПОДВАЛ
+       ========================================================= */
+    .footer { padding: 40px 0 120px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+    .footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
+    .footer a { text-underline-offset: 3px; }
+    @media (min-width: 768px) { .footer { padding-bottom: 40px; } }
+
+    /* Липкая кнопка записи на телефоне */
+    .sticky-cta {
+      position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 40;
+      transform: translateY(140%); transition: transform .3s var(--ease);
+    }
+    .sticky-cta.is-visible { transform: none; }
+    .sticky-cta .btn { width: 100%; box-shadow: 0 12px 32px rgba(0, 0, 0, .5); }
+    @media (min-width: 768px) { .sticky-cta { display: none; } }
+
+    /* Плашка «Демо» — в шапке рядом с логотипом, чтобы не перекрывать контент */
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .demo-badge {
+      padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px;
+      color: var(--muted); font-size: 12px; letter-spacing: .06em;
+    }
+
+    /* Появление блоков при скролле */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+    .reveal.is-in { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .ticker__track { animation: none; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .shot img, .sticky-cta { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SVG-иконки: объявлены один раз, используются через <use> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-telegram" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5L18 6.2c.4-.4-.1-.6-.6-.2L6.3 13.1l-4.8-1.5c-1-.3-1-1 .2-1.5L20.5 2.9c.9-.3 1.6.2 1.4 1.4Z"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></g></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M18 6 6 18M6 6l12 12"/></symbol>
+  </svg>
+
+  <!-- ========== ШАПКА ========== -->
+  <header class="header" id="header">
+    <div class="wrap">
+      <div class="brand">
+        <a class="logo" href="#top">Alexandrov<span>.11</span></a>
+        <span class="demo-badge">Демо</span>
+      </div>
+      <nav class="nav" aria-label="Розділи сайту">
+        <a href="#works">Роботи</a>
+        <a href="#services">Послуги</a>
+        <a href="#about">Про мене</a>
+        <a href="#booking">Контакти</a>
+      </nav>
+      <a class="btn btn--primary" href="https://t.me/Alexandrovd1" target="_blank" rel="noopener">Записатися</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ========== ПЕРВЫЙ ЭКРАН ========== -->
+    <section class="hero">
+      <div class="wrap hero__grid">
+        <div class="hero__head">
+          <p class="hero__meta">Перукар · Дніпро</p>
+          <h1 class="hero__title">Данило<span>Александров</span></h1>
+        </div>
+        <div class="hero__body">
+          <p class="hero__text">Подовжені чоловічі стрижки, чисті фейди й гоління бритвою. Працюю в <strong>особистому просторі Trinity</strong>: тільки майстер і клієнт, без черги й зайвого шуму.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="https://t.me/Alexandrovd1" target="_blank" rel="noopener">
+              <svg aria-hidden="true"><use href="#i-telegram"/></svg>
+              Записатися в Telegram
+            </a>
+            <a class="btn btn--ghost" href="#works">Дивитися роботи</a>
+          </div>
+        </div>
+        <div class="hero__photo">
+          <img src="images/danil-portrait.webp" alt="Данило Александров" width="480" height="863" fetchpriority="high">
+          <span class="hero__tag">Trinity · Дніпро</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Бегущая строка: дублируем набор, чтобы анимация шла без разрыва -->
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track">
+        <span class="ticker__item">Eleven Barber Studio</span>
+        <span class="ticker__item">UBM 2023</span>
+        <span class="ticker__item">Uppercut</span>
+        <span class="ticker__item">Clippers Live</span>
+        <span class="ticker__item">Майстер-клас Underground Style</span>
+        <span class="ticker__item">Eleven Barber Studio</span>
+        <span class="ticker__item">UBM 2023</span>
+        <span class="ticker__item">Uppercut</span>
+        <span class="ticker__item">Clippers Live</span>
+        <span class="ticker__item">Майстер-клас Underground Style</span>
+      </div>
+    </div>
+
+    <!-- ========== РАБОТЫ ========== -->
+    <section class="section" id="works">
+      <div class="wrap">
+        <div class="works__head reveal">
+          <div>
+            <p class="eyebrow">01 — Роботи</p>
+            <h2 class="section__title">Стрижки</h2>
+          </div>
+          <div class="filters" role="group" aria-label="Фільтр робіт">
+            <button class="filter" type="button" data-filter="all" aria-pressed="true">Усі</button>
+            <button class="filter" type="button" data-filter="long" aria-pressed="false">Подовжені</button>
+            <button class="filter" type="button" data-filter="fade" aria-pressed="false">Фейди</button>
+            <button class="filter" type="button" data-filter="beard" aria-pressed="false">Борода</button>
+          </div>
+        </div>
+
+        <div class="gallery" id="gallery">
+          <button class="shot shot--wide" type="button" data-cat="long"><img src="images/long-shag.webp" alt="Подовжена текстурна стрижка, вигляд збоку" width="1239" height="945" loading="lazy"><span class="shot__label">Подовжений шег</span></button>
+          <button class="shot" type="button" data-cat="long"><img src="images/curtain-bangs.webp" alt="Подовжена стрижка з чубчиком" width="756" height="945" loading="lazy"><span class="shot__label">Подовжена з чубчиком</span></button>
+          <button class="shot" type="button" data-cat="fade"><img src="images/crop-fringe-fade.webp" alt="Кроп з рівним чубчиком і фейдом" width="756" height="945" loading="lazy"><span class="shot__label">Кроп + фейд</span></button>
+          <button class="shot" type="button" data-cat="long"><img src="images/wavy-long.webp" alt="Подовжена хвиляста стрижка" width="756" height="945" loading="lazy"><span class="shot__label">Хвиляста подовжена</span></button>
+          <button class="shot" type="button" data-cat="fade beard"><img src="images/textured-beard-fade.webp" alt="Текстурний верх, фейд і оформлення бороди" width="779" height="945" loading="lazy"><span class="shot__label">Текстура + борода</span></button>
+          <button class="shot" type="button" data-cat="fade"><img src="images/high-fade-tattoo.webp" alt="Короткий високий фейд" width="846" height="945" loading="lazy"><span class="shot__label">Високий фейд</span></button>
+          <button class="shot" type="button" data-cat="long"><img src="images/slick-back.webp" alt="Подовжена стрижка з укладкою назад" width="756" height="945" loading="lazy"><span class="shot__label">Slick back</span></button>
+          <button class="shot" type="button" data-cat="fade"><img src="images/skin-fade-quiff.webp" alt="Скін-фейд з укладкою вгору" width="757" height="945" loading="lazy"><span class="shot__label">Скін-фейд</span></button>
+          <button class="shot" type="button" data-cat="long"><img src="images/textured-fringe.webp" alt="Текстурна стрижка з рваним чубчиком" width="709" height="945" loading="lazy"><span class="shot__label">Рвана текстура</span></button>
+          <button class="shot" type="button" data-cat="fade"><img src="images/french-crop-fade.webp" alt="Французький кроп з низьким фейдом" width="945" height="945" loading="lazy"><span class="shot__label">French crop</span></button>
+          <button class="shot" type="button" data-cat="beard"><img src="images/beard-classic.webp" alt="Класична стрижка й оформлення бороди" width="709" height="945" loading="lazy"><span class="shot__label">Класика + борода</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== ПОСЛУГИ ========== -->
+    <section class="section services" id="services">
+      <div class="wrap services__grid">
+        <div class="reveal">
+          <p class="eyebrow">02 — Послуги</p>
+          <h2 class="section__title">Що<br>роблю</h2>
+          <p class="section__lead">Перед стрижкою обговорюємо форму, тип волосся й те, як ви укладаєтесь удома. Під час візиту пригощаю кавою.</p>
+        </div>
+        <div class="reveal">
+          <ol class="service-list">
+            <li class="service"><span class="service__num">01</span><span class="service__name">Подовжена чоловіча стрижка</span><span class="service__desc">Шег, мулет, curtain bangs, текстура. Моя основна спеціалізація.</span></li>
+            <li class="service"><span class="service__num">02</span><span class="service__name">Класична стрижка машинкою</span><span class="service__desc">Фейди будь-якої висоти, кроп, андеркат.</span></li>
+            <li class="service"><span class="service__num">03</span><span class="service__name">Гоління бритвою</span><span class="service__desc">Класичне гоління небезпечною бритвою.</span></li>
+            <li class="service"><span class="service__num">04</span><span class="service__name">Камуфляж сивини</span><span class="service__desc">Волосся та борода. Природний результат без ефекту фарби.</span></li>
+            <li class="service"><span class="service__num">05</span><span class="service__name">Восковидалення</span></li>
+            <li class="service"><span class="service__num">06</span><span class="service__name">Жіночі стрижки</span><span class="service__desc">Кінчики, каскад, каре.</span></li>
+          </ol>
+          <p class="services__note">Вартість і вільні вікна підкажу в <a href="https://t.me/Alexandrovd1" target="_blank" rel="noopener">Telegram</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== ПРО МЕНЕ ========== -->
+    <section class="section" id="about">
+      <div class="wrap about__grid">
+        <div class="about__photo reveal">
+          <img src="images/danil-at-work.webp" alt="Данило Александров стриже клієнта" width="709" height="915" loading="lazy">
+        </div>
+        <div class="reveal">
+          <p class="eyebrow">03 — Про мене</p>
+          <h2 class="section__title">Простір<br>Trinity</h2>
+          <div class="about__text">
+            <p>Мене звати Данило, я перукар із Дніпра. Найбільше люблю <strong>подовжені чоловічі стрижки</strong> і навіть зробив про них авторський майстер-клас.</p>
+            <p>Зараз приймаю в <strong>Trinity</strong>. Це особистий простір у ЖК «Панорама», де на годину є тільки ми двоє: можна спокійно поговорити про стиль і не поспішати.</p>
+          </div>
+          <div class="facts">
+            <div class="fact"><p class="fact__value">236</p><p class="fact__label">робіт в Instagram</p></div>
+            <div class="fact"><p class="fact__value">1,5K</p><p class="fact__label">підписників</p></div>
+            <div class="fact"><p class="fact__value">1:1</p><p class="fact__label">майстер і клієнт</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== МАЙСТЕР-КЛАС ========== -->
+    <section class="section master" id="masterclass">
+      <div class="wrap master__grid">
+        <div class="master__poster reveal">
+          <img src="images/masterclass-poster.webp" alt="Афіша майстер-класу Underground Style у барбершопі SHUM" width="709" height="945" loading="lazy">
+        </div>
+        <div class="reveal">
+          <p class="eyebrow">04 — Для барберів</p>
+          <h2 class="master__title">Underground <em>style</em></h2>
+          <p class="section__lead">Авторський майстер-клас із подовжених чоловічих стрижок для барберів і перукарів.</p>
+          <ul class="master__list">
+            <li>Тема: подовжені чоловічі стрижки</li>
+            <li>Минулий майстер-клас: барбершоп SHUM, вул. Гоголя, 11</li>
+            <li>Дату наступного уточнюйте в Telegram</li>
+          </ul>
+          <a class="btn btn--ghost" href="https://t.me/Alexandrovd1" target="_blank" rel="noopener">Дізнатися про наступний</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== ЗАПИС ========== -->
+    <section class="section" id="booking">
+      <div class="wrap">
+        <p class="eyebrow reveal">05 — Запис</p>
+        <h2 class="booking__title reveal">Записатися<br><span>на стрижку</span></h2>
+
+        <div class="booking__grid reveal">
+          <a class="contact" href="https://t.me/Alexandrovd1" target="_blank" rel="noopener">
+            <svg aria-hidden="true"><use href="#i-telegram"/></svg>
+            <span class="contact__label">Telegram</span>
+            <span class="contact__value">@Alexandrovd1</span>
+            <span class="contact__hint">Найшвидше: відповідаю тут</span>
+          </a>
+          <a class="contact" href="tel:+380955499893">
+            <svg aria-hidden="true"><use href="#i-phone"/></svg>
+            <span class="contact__label">Телефон</span>
+            <span class="contact__value">+380 95 549 98 93</span>
+            <span class="contact__hint">Можна просто зателефонувати</span>
+          </a>
+          <a class="contact" href="https://www.google.com/maps/search/?api=1&query=%D0%94%D0%BD%D1%96%D0%BF%D1%80%D0%BE%2C+%D0%B2%D1%83%D0%BB.+%D0%A1%D1%96%D0%BC%D1%84%D0%B5%D1%80%D0%BE%D0%BF%D0%BE%D0%BB%D1%8C%D1%81%D1%8C%D0%BA%D0%B0%2C+2%D0%9C" target="_blank" rel="noopener">
+            <svg aria-hidden="true"><use href="#i-pin"/></svg>
+            <span class="contact__label">Адреса</span>
+            <span class="contact__value">Сімферопольська, 2М</span>
+            <span class="contact__hint">ЖК «Панорама», біля Sport Life</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========== ПОДВАЛ ========== -->
+  <footer class="footer">
+    <div class="wrap">
+      <p>© <span id="year"></span> Данило Александров · Дніпро</p>
+      <a href="https://www.instagram.com/alexandrov.d11/" target="_blank" rel="noopener">Instagram @alexandrov.d11</a>
+    </div>
+  </footer>
+
+  <!-- Липкая кнопка записи (только телефон) -->
+  <div class="sticky-cta" id="stickyCta">
+    <a class="btn btn--primary" href="https://t.me/Alexandrovd1" target="_blank" rel="noopener">
+      <svg aria-hidden="true"><use href="#i-telegram"/></svg>
+      Записатися в Telegram
+    </a>
+  </div>
+
+  <!-- Лайтбокс -->
+  <dialog class="lightbox" id="lightbox" aria-label="Перегляд фото">
+    <button class="lightbox__close" type="button" id="lightboxClose" aria-label="Закрити">
+      <svg aria-hidden="true"><use href="#i-close"/></svg>
+    </button>
+    <img id="lightboxImg" src="" alt="">
+    <p class="lightbox__caption" id="lightboxCaption"></p>
+  </dialog>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Шапка получает рамку после начала скролла, а липкая кнопка появляется после первого экрана
+    const header = document.getElementById('header');
+    const stickyCta = document.getElementById('stickyCta');
+    const hero = document.querySelector('.hero');
+    const onScroll = () => {
+      header.classList.toggle('is-scrolled', window.scrollY > 8);
+      stickyCta.classList.toggle('is-visible', window.scrollY > hero.offsetHeight * 0.8);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Фильтр работ: у каждой карточки в data-cat одна или несколько категорий через пробел
+    const filters = document.querySelectorAll('.filter');
+    const shots = document.querySelectorAll('.shot');
+    filters.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const value = btn.dataset.filter;
+        filters.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        shots.forEach((shot) => {
+          shot.hidden = value !== 'all' && !shot.dataset.cat.split(' ').includes(value);
+        });
+      });
+    });
+
+    // Лайтбокс: открываем фото крупно, закрываем крестиком, кликом по фону или Esc (Esc даёт сам <dialog>)
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    shots.forEach((shot) => {
+      shot.addEventListener('click', () => {
+        const img = shot.querySelector('img');
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        lightboxCaption.textContent = shot.querySelector('.shot__label').textContent;
+        lightbox.showModal();
+      });
+    });
+    document.getElementById('lightboxClose').addEventListener('click', () => lightbox.close());
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.close(); });
+
+    // Плавное появление блоков при скролле
+    const reveals = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      reveals.forEach((el) => io.observe(el));
+    } else {
+      reveals.forEach((el) => el.classList.add('is-in'));
+    }
+  </script>
+</body>
+</html>
